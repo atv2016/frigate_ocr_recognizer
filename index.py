@@ -13,6 +13,11 @@ import sys
 import json
 import requests
 
+# EasyOCR & PyTorch
+import easyocr
+import torch
+import gc
+
 import io
 from PIL import Image, ImageDraw, UnidentifiedImageError, ImageFont
 import difflib
@@ -25,13 +30,13 @@ _LOGGER = None
 VERSION = '1.8.13'
 
 CONFIG_PATH = '/config/config.yml'
-DB_PATH = '/config/frigate_plate_recogizer.db'
-LOG_FILE = '/config/frigate_plate_recogizer.log'
-SNAPSHOT_PATH = '/plates'
+DB_PATH = '/config/frigate_ocr_recogizer.db'
+LOG_FILE = '/config/frigate_ocr_recogizer.log'
+SNAPSHOT_PATH = '/ocr'
 
 DATETIME_FORMAT = "%Y-%m-%d_%H-%M"
 
-PLATE_RECOGIZER_BASE_URL = 'https://api.platerecognizer.com/v1/plate-reader'
+#PLATE_RECOGIZER_BASE_URL = 'https://api.platerecognizer.com/v1/plate-reader'
 DEFAULT_OBJECTS = ['car', 'motorcycle', 'bus']
 CURRENT_EVENTS = {}
 
