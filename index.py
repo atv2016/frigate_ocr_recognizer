@@ -32,7 +32,7 @@ VERSION = '1.8.13'
 CONFIG_PATH = '/config/config.yml'
 DB_PATH = '/config/frigate_ocr_recogizer.db'
 LOG_FILE = '/config/frigate_ocr_recogizer.log'
-SNAPSHOT_PATH = '/ocr'
+CLEAN_SNAPSHOT_PATH = '/ocr'
 
 DATETIME_FORMAT = "%Y-%m-%d_%H-%M"
 
@@ -233,8 +233,8 @@ def has_common_value(array1, array2):
     return any(value in array2 for value in array1)
 
 def save_image(config, after_data, frigate_url, frigate_event_id, plate_number):
-    if not config['frigate'].get('save_snapshots', False):
-        _LOGGER.debug(f"Skipping saving snapshot because save_snapshots is set to false")
+    if not config['frigate'].get('save_clean_snapshots', False):
+        _LOGGER.debug(f"Skipping saving clean snapshot because save_clean_snapshots is set to false")
         return
     
     # get latest Event Data from Frigate API
@@ -242,12 +242,12 @@ def save_image(config, after_data, frigate_url, frigate_event_id, plate_number):
     
     final_attribute = get_final_data(event_url) 
          
-    # get latest snapshot
-    snapshot = get_snapshot(frigate_event_id, frigate_url, False)
-    if not snapshot:
+    # get latest clean snapshot
+    clean_snapshot = get_clean_snapshot(frigate_event_id, frigate_url, False)
+    if not clean_snapshot:
         return
 
-    image = Image.open(io.BytesIO(bytearray(snapshot)))
+    image = Image.open(io.BytesIO(bytearray(clean_snapshot)))
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("./Arial.ttf", size=14)
     
@@ -283,7 +283,7 @@ def save_image(config, after_data, frigate_url, frigate_event_id, plate_number):
     if plate_number:
         image_name = f"{str(plate_number).upper()}_{image_name}"
 
-    image_path = f"{SNAPSHOT_PATH}/{image_name}"
+    image_path = f"{CLEAN_SNAPSHOT_PATH}/{image_name}"
     _LOGGER.info(f"Saving image with path: {image_path}")
     image.save(image_path)
 
@@ -320,17 +320,17 @@ def check_invalid_event(before_data, after_data):
         return True
     return False
 
-def get_snapshot(frigate_event_id, frigate_url, cropped):
+def get_clean_snapshot(frigate_event_id, frigate_url, cropped):
     _LOGGER.debug(f"Getting snapshot for event: {frigate_event_id}, Crop: {cropped}")
-    snapshot_url = f"{frigate_url}/api/events/{frigate_event_id}/snapshot.jpg"
-    _LOGGER.debug(f"event URL: {snapshot_url}")
+    clean_snapshot_url = f"{frigate_url}/clips/{camera}-{frigate_event_id}-clean.png"
+    _LOGGER.debug(f"event URL: {clean_snapshot_url}")
 
     # get snapshot
-    response = requests.get(snapshot_url, params={ "crop": cropped, "quality": 95 })
+    response = requests.get(clean_snapshot_url, params={ "crop": cropped, "quality": 95 })
 
     # Check if the request was successful (HTTP status code 200)
     if response.status_code != 200:
-        _LOGGER.error(f"Error getting snapshot: {response.status_code}")
+        _LOGGER.error(f"Error getting clean snapshot: {response.status_code}")
         return
 
     return response.content
@@ -391,15 +391,15 @@ def is_duplicate_event(frigate_event_id):
 
     return False
 
-def get_plate(snapshot):
+def get_plate(clean_snapshot):
     # try to get plate number
     plate_number = None
     plate_score = None
 
     if config.get('plate_recognizer'):
-        plate_number, plate_score , watched_plate, fuzzy_score = plate_recognizer(snapshot)
+        plate_number, plate_score , watched_plate, fuzzy_score = plate_recognizer(clean_snapshot)
     elif config.get('code_project'):
-        plate_number, plate_score, watched_plate, fuzzy_score = code_project(snapshot)
+        plate_number, plate_score, watched_plate, fuzzy_score = code_project(clean_snapshot)
     else:
         _LOGGER.error("Plate Recognizer is not configured")
         return None, None, None, None
@@ -460,9 +460,9 @@ def on_message(client, userdata, message):
         CURRENT_EVENTS[frigate_event_id] =  0
         
     
-    snapshot = get_snapshot(frigate_event_id, frigate_url, True)
-    if not snapshot:
-        del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to snapshot failure - will try again next frame
+    clean_snapshot = get_clean_snapshot(frigate_event_id, frigate_url, True)
+    if not clean_snapshot:
+        del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
         return
 
     _LOGGER.debug(f"Getting plate for event: {frigate_event_id}")
@@ -472,7 +472,7 @@ def on_message(client, userdata, message):
             return
         CURRENT_EVENTS[frigate_event_id] += 1
 
-    plate_number, plate_score, watched_plate, fuzzy_score = get_plate(snapshot)
+    plate_number, plate_score, watched_plate, fuzzy_score = get_plate(clean_snapshot)
     if plate_number:
         start_time = datetime.fromtimestamp(after_data['start_time'])
         formatted_start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -485,7 +485,7 @@ def on_message(client, userdata, message):
 
         send_mqtt_message(plate_number, plate_score, frigate_event_id, after_data, formatted_start_time, watched_plate, fuzzy_score)
          
-    if plate_number or config['frigate'].get('always_save_snapshot', False):
+    if plate_number or config['frigate'].get('always_save_clean_snapshot', False):
         save_image(
             config=config,
             after_data=after_data,
@@ -515,9 +515,9 @@ def load_config():
     with open(CONFIG_PATH, 'r') as config_file:
         config = yaml.safe_load(config_file)
 
-    if SNAPSHOT_PATH:
-        if not os.path.isdir(SNAPSHOT_PATH):
-            os.makedirs(SNAPSHOT_PATH)
+    if CLEAN_SNAPSHOT_PATH:
+        if not os.path.isdir(CLEAN_SNAPSHOT_PATH):
+            os.makedirs(CLEAN_SNAPSHOT_PATH)
 
 def run_mqtt_client():
     global mqtt_client
@@ -526,7 +526,7 @@ def run_mqtt_client():
     current_time = now.strftime("%Y%m%d%H%M%S")
 
     # setup mqtt client
-    mqtt_client = mqtt.Client("FrigatePlateRecognizer" + current_time)
+    mqtt_client = mqtt.Client("FrigateOCRRecognizer" + current_time)
     mqtt_client.on_message = on_message
     mqtt_client.on_disconnect = on_disconnect
     mqtt_client.on_connect = on_connect
@@ -570,13 +570,13 @@ def main():
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
     _LOGGER.info(f"Time: {current_time}")
     _LOGGER.info(f"Python Version: {sys.version}")
-    _LOGGER.info(f"Frigate Plate Recognizer Version: {VERSION}")
+    _LOGGER.info(f"Frigate OCR Recognizer Version: {VERSION}")
     _LOGGER.debug(f"config: {config}")
 
-    if config.get('plate_recognizer'):
-        _LOGGER.info(f"Using Plate Recognizer API")
-    else:
-        _LOGGER.info(f"Using CodeProject.AI API")
+ #   if config.get('plate_recognizer'):
+ #       _LOGGER.info(f"Using Plate Recognizer API")
+ #   else:
+ #       _LOGGER.info(f"Using CodeProject.AI API")
 
 
     run_mqtt_client()
