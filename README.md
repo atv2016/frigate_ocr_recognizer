@@ -1,6 +1,6 @@
 # Frigate OCR Recognizer
 
-Identify OCR text using EasyOCR and Pytorch and add them as sublabels to [blakeblackshear/frigate](https://github.com/blakeblackshear/frigate)
+Identify OCR text using EasyOCR and Pytorch and add them as sublabels to [blakeblackshear/frigate](https://github.com/blakeblackshear/frigate) using Frigate events API and MQTT.
 
 This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work.
 
@@ -48,7 +48,7 @@ If no objects are speficied in the Frigate options, it will default to `[motorcy
 ### Running
 
 ```bash
-docker run -v /path/to/config:/config -e TZ=America/New_York -it --rm --name frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
+docker run -v /path/to/config:/config -e TZ=Europe/London -it --rm --name frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
 ```
 
 or using docker-compose:
