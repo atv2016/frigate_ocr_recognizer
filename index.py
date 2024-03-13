@@ -83,27 +83,7 @@ def set_sublabel(frigate_url, frigate_event_id, sublabel, score):
         _LOGGER.error(f"Failed to set sublabel. Status code: {response.status_code}")
 
 def ocr_recognizer(image):
-#    api_url = config['ocr_recognizer'].get('api_url') or PLATE_RECOGIZER_BASE_URL
-#    token = config['ocr_recognizer']['token']
-
-#    response = requests.post(
-#        api_url,
-#        data=dict(regions=config['plate_recognizer']['regions']),
-#        files=dict(upload=image),
-#        headers={'Authorization': f'Token {token}'}
-#    )
-
-#    response = response.json()
-#    _LOGGER.debug(f"response: {response}")
-
-#    if response.get('results') is None:
-#        _LOGGER.error(f"Failed to get plate number. Response: {response}")
-#        return None, None, None, None
-
-#    if len(response['results']) == 0:
-#        _LOGGER.debug(f"No plates found")
-#        return None, None, None, None
- 
+    
     # Do gc and memory cleanup as Pytorch is memory intensive
     gc.collect()
     torch.cuda.ipc_collect()
