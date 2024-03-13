@@ -169,7 +169,7 @@ def save_image(config, after_data, frigate_url, frigate_event_id, ocr_text):
     final_attribute = get_final_data(event_url) 
          
     # get latest clean snapshot
-    clean_snapshot = get_clean_snapshot(frigate_event_id, frigate_url, False)
+    clean_snapshot = get_clean_snapshot(after_data['camera'],frigate_event_id, frigate_url, False)
     if not clean_snapshot:
         return
 
@@ -246,7 +246,7 @@ def check_invalid_event(before_data, after_data):
         return True
     return False
 
-def get_clean_snapshot(frigate_event_id, frigate_url, cropped):
+def get_clean_snapshot(camera,frigate_event_id, frigate_url, cropped):
     _LOGGER.debug(f"Getting snapshot for event: {frigate_event_id}, Crop: {cropped}")
     clean_snapshot_url = f"{frigate_url}/clips/{camera}-{frigate_event_id}-clean.png"
     _LOGGER.debug(f"event URL: {clean_snapshot_url}")
@@ -365,6 +365,7 @@ def on_message(client, userdata, message):
     
     frigate_url = config['frigate']['frigate_url']
     frigate_event_id = after_data['id']
+    camera = after_data['camera']
     
     if type == 'end' and after_data['id'] in CURRENT_EVENTS:
         _LOGGER.debug(f"CLEARING EVENT: {frigate_event_id} after {CURRENT_EVENTS[frigate_event_id]} calls to AI engine")
@@ -383,8 +384,8 @@ def on_message(client, userdata, message):
     if not type == 'end' and not after_data['id'] in CURRENT_EVENTS:
         CURRENT_EVENTS[frigate_event_id] =  0
         
-    
-    clean_snapshot = get_clean_snapshot(frigate_event_id, frigate_url, True)
+    clean_snapshot = get_clean_snapshot(camera,frigate_event_id, frigate_url, True)
+
     if not clean_snapshot:
         del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
         return
