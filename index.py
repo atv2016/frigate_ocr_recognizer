@@ -232,7 +232,7 @@ def send_mqtt_message(plate_number, plate_score, frigate_event_id, after_data, f
 def has_common_value(array1, array2):
     return any(value in array2 for value in array1)
 
-def save_image(config, after_data, frigate_url, frigate_event_id, plate_number):
+def save_image(config, after_data, frigate_url, frigate_event_id, ocr_text):
     if not config['frigate'].get('save_clean_snapshots', False):
         _LOGGER.debug(f"Skipping saving clean snapshot because save_clean_snapshots is set to false")
         return
@@ -258,30 +258,30 @@ def save_image(config, after_data, frigate_url, frigate_event_id, plate_number):
         dimension_3 = final_attribute[0]['box'][2]
         dimension_4 = final_attribute[0]['box'][3]
 
-        plate = (
+        ocr_box = (
             dimension_1 * image_width,
             dimension_2 * image_height,
             (dimension_1 + dimension_3) * image_width,
             (dimension_2 + dimension_4) * image_height
         )
-        draw.rectangle(plate, outline="red", width=2) 
-        _LOGGER.debug(f"Drawing Plate Box: {plate}")
+        draw.rectangle(ocr_box, outline="red", width=2) 
+        _LOGGER.debug(f"Drawing OCR Box: {ocr_box}")
         
-        if plate_number:
+        if ocr_text:
             draw.text(
                 (
                     (dimension_1 * image_width)+  5,
                     ((dimension_2 + dimension_4) * image_height) + 5
                 ), 
-                str(plate_number).upper(), 
+                str(ocr_text).upper(), 
                 font=font
             )      
 
     # save image
     timestamp = datetime.now().strftime(DATETIME_FORMAT)
     image_name = f"{after_data['camera']}_{timestamp}.png"
-    if plate_number:
-        image_name = f"{str(plate_number).upper()}_{image_name}"
+    if ocr_text:
+        image_name = f"{str(ocr_text).upper()}_{image_name}"
 
     image_path = f"{CLEAN_SNAPSHOT_PATH}/{image_name}"
     _LOGGER.info(f"Saving image with path: {image_path}")
@@ -414,14 +414,14 @@ def get_plate(clean_snapshot):
 
     return plate_number, plate_score, watched_plate, fuzzy_score
 
-def store_plate_in_db(plate_number, plate_score, frigate_event_id, after_data, formatted_start_time):
+def store_plate_in_db(ocr_text, ocr_score, frigate_event_id, after_data, formatted_start_time):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    _LOGGER.info(f"Storing plate number in database: {plate_number} with score: {plate_score}")
+    _LOGGER.info(f"Storing OCR text in database: {ocr_text} with score: {ocr_score}")
 
     cursor.execute("""INSERT INTO plates (detection_time, score, plate_number, frigate_event, camera_name) VALUES (?, ?, ?, ?, ?)""",
-        (formatted_start_time, plate_score, plate_number, frigate_event_id, after_data['camera'])
+        (formatted_start_time, ocr_score, ocr_text, frigate_event_id, after_data['camera'])
     )
 
     conn.commit()
@@ -452,9 +452,9 @@ def on_message(client, userdata, message):
     if is_duplicate_event(frigate_event_id):
         return
 
-    frigate_plus = config['frigate'].get('frigate_plus', False)
-    if frigate_plus and not is_valid_license_plate(after_data):
-        return
+ #   frigate_plus = config['frigate'].get('frigate_plus', False)
+ #   if frigate_plus and not is_valid_license_plate(after_data):
+ #       return
     
     if not type == 'end' and not after_data['id'] in CURRENT_EVENTS:
         CURRENT_EVENTS[frigate_event_id] =  0
@@ -465,33 +465,33 @@ def on_message(client, userdata, message):
         del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
         return
 
-    _LOGGER.debug(f"Getting plate for event: {frigate_event_id}")
+    _LOGGER.debug(f"Getting OCR for event: {frigate_event_id}")
     if frigate_event_id in CURRENT_EVENTS:
         if config['frigate'].get('max_attempts', 0) > 0 and CURRENT_EVENTS[frigate_event_id] > config['frigate'].get('max_attempts', 0):
             _LOGGER.debug(f"Maximum number of AI attempts reached for event {frigate_event_id}: {CURRENT_EVENTS[frigate_event_id]}")
             return
         CURRENT_EVENTS[frigate_event_id] += 1
 
-    plate_number, plate_score, watched_plate, fuzzy_score = get_plate(clean_snapshot)
-    if plate_number:
+    ocr_text, ocr_score, watched_ocr, fuzzy_score = get_plate(clean_snapshot)
+    if ocr_text:
         start_time = datetime.fromtimestamp(after_data['start_time'])
         formatted_start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
         
-        if watched_plate:
-            store_plate_in_db(watched_plate, plate_score, frigate_event_id, after_data, formatted_start_time)
+        if watched_ocr:
+            store_plate_in_db(watched_ocr, ocr_score, frigate_event_id, after_data, formatted_start_time)
         else:
-            store_plate_in_db(plate_number, plate_score, frigate_event_id, after_data, formatted_start_time)
-        set_sublabel(frigate_url, frigate_event_id, watched_plate if watched_plate else plate_number, plate_score)
+            store_plate_in_db(ocr_text, ocr_score, frigate_event_id, after_data, formatted_start_time)
+        set_sublabel(frigate_url, frigate_event_id, watched_ocr if watched_ocr else ocr_text, ocr_score)
 
-        send_mqtt_message(plate_number, plate_score, frigate_event_id, after_data, formatted_start_time, watched_plate, fuzzy_score)
+        send_mqtt_message(ocr_text, ocr_score, frigate_event_id, after_data, formatted_start_time, watched_ocr, fuzzy_score)
          
-    if plate_number or config['frigate'].get('always_save_clean_snapshot', False):
+    if ocr_text or config['frigate'].get('always_save_clean_snapshot', False):
         save_image(
             config=config,
             after_data=after_data,
             frigate_url=frigate_url,
             frigate_event_id=frigate_event_id,
-            plate_number=watched_plate if watched_plate else plate_number
+            plate_number=watched_ocr if watched_ocr else ocr_text
         )
 
 def setup_db():
