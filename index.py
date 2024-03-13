@@ -82,35 +82,6 @@ def set_sublabel(frigate_url, frigate_event_id, sublabel, score):
     else:
         _LOGGER.error(f"Failed to set sublabel. Status code: {response.status_code}")
 
-def code_project(image):
-    api_url = config['code_project'].get('api_url')
-
-    response = requests.post(
-        api_url,
-        files=dict(upload=image),
-    )
-    response = response.json()
-    _LOGGER.debug(f"response: {response}")
-
-    if response.get('predictions') is None:
-        _LOGGER.error(f"Failed to get plate number. Response: {response}")
-        return None, None, None, None
-
-    if len(response['predictions']) == 0:
-        _LOGGER.debug(f"No plates found")
-        return None, None, None, None
-
-    plate_number = response['predictions'][0].get('plate')
-    score = response['predictions'][0].get('confidence')
-    
-    watched_plate, watched_score, fuzzy_score = check_watched_plates(plate_number, response['predictions'])   
-    if fuzzy_score:
-        return plate_number, score, watched_plate, fuzzy_score
-    elif watched_plate: 
-        return plate_number, watched_score, watched_plate, None
-    else:
-        return plate_number, score, None, None
-
 def ocr_recognizer(image):
 #    api_url = config['ocr_recognizer'].get('api_url') or PLATE_RECOGIZER_BASE_URL
 #    token = config['ocr_recognizer']['token']
