@@ -144,78 +144,38 @@ def plate_recognizer(image):
     else:
         return plate_number, score, None, None
 
-def check_watched_plates(plate_number, response):
-    config_watched_plates = config['frigate'].get('watched_plates', [])
-    if not config_watched_plates:
-        _LOGGER.debug("Skipping checking Watched Plates because watched_plates is not set")
+def check_watched_ocr(ocr_text, response):
+    config_watched_ocr = config['frigate'].get('watched_ocr', [])
+    if not config_watched_ocr:
+        _LOGGER.debug("Skipping checking Watched OCR because watched_ocr is not set")
         return None, None, None
     
-    config_watched_plates = [str(x).lower() for x in config_watched_plates] #make sure watched_plates are all lower case
+    config_watched_ocr = [str(x).lower() for x in config_ocr_plates] #make sure watched_ocr are all lower case
     
-    #Step 1 - test if top plate is a watched plate
-    matching_plate = str(plate_number).lower() in config_watched_plates 
-    if matching_plate:
-        _LOGGER.info(f"Recognised plate is a Watched Plate: {plate_number}")
+    #Step 1 - test if top ocr is a watched ocr
+    matching_ocr = str(ocr_text).lower() in config_watched_ocr 
+    if matching_ocr:
+        _LOGGER.info(f"Recognised OCR is a Watched OCR: {ocr_text}")
         return None, None, None  
     
-    #Step 2 - test against AI candidates:
-    for i, plate in enumerate(response): 
-        matching_plate = plate.get('plate') in config_watched_plates
-        if matching_plate:
-            if config.get('plate_recognizer'):
-                score = plate.get('score')
-            else: 
-                if i == 0: continue  #skip first response for CodeProjet.AI as index 0 = original plate.
-                score = plate.get('confidence')
-            _LOGGER.info(f"Watched plate found from AI candidates: {plate.get('plate')} with score {score}")
-            return plate.get('plate'), score, None
-    
-    _LOGGER.debug("No Watched Plates found from AI candidates")
-    
-    #Step 3 - test against fuzzy match:
-    fuzzy_match = config['frigate'].get('fuzzy_match', 0) 
-    
-    if fuzzy_match == 0:
-        _LOGGER.debug(f"Skipping fuzzy matching because fuzzy_match value not set in config")
-        return None, None, None
-    
-    max_score = 0
-    best_match = None
-    for candidate in config_watched_plates:
-        seq = difflib.SequenceMatcher(a=str(plate_number).lower(), b=str(candidate).lower())
-        if seq.ratio() > max_score: 
-            max_score = seq.ratio()
-            best_match = candidate
-    
-    _LOGGER.debug(f"Best fuzzy_match: {best_match} ({max_score})")
-
-    if max_score >= fuzzy_match:
-        _LOGGER.info(f"Watched plate found from fuzzy matching: {best_match} with score {max_score}")    
-        return best_match, None, max_score
-        
-
-    _LOGGER.debug("No matching Watched Plates found.")
-    #No watched_plate matches found 
-    return None, None, None
-    
-def send_mqtt_message(plate_number, plate_score, frigate_event_id, after_data, formatted_start_time, watched_plate, fuzzy_score):
+def send_mqtt_message(ocr_text, ocr_score, frigate_event_id, after_data, formatted_start_time, watched_ocr, fuzzy_score):
     if not config['frigate'].get('return_topic'):
         return
 
-    if watched_plate:
+    if watched_ocr:
         message = {
-            'plate_number': str(watched_plate).upper(),
-            'score': plate_score,
+            'ocr_text': str(watched_ocr).upper(),
+            'score': ocr_score,
             'frigate_event_id': frigate_event_id,
             'camera_name': after_data['camera'],
             'start_time': formatted_start_time,
             'fuzzy_score': fuzzy_score,
-            'original_plate': str(plate_number).upper()
+            'original_plate': str(ocr_text).upper()
         }
     else:
         message = {
-            'plate_number': str(plate_number).upper(),
-            'score': plate_score,
+            'ocr_text': str(ocr_text).upper(),
+            'score': ocr_score,
             'frigate_event_id': frigate_event_id,
             'camera_name': after_data['camera'],
             'start_time': formatted_start_time
