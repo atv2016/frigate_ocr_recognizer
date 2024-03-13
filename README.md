@@ -2,7 +2,9 @@
 
 Identify OCR text using EasyOCR and Pytorch and add them as sublabels to [blakeblackshear/frigate](https://github.com/blakeblackshear/frigate)
 
-This is an experimental fork of [ljmerza/frigate_plate_recognizer] (https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work.
+This is an experimental fork of [ljmerza/frigate_plate_recognizer] 
+(https://github.com/ljmerza/frigate_plate_recognizer/tree/master) 
+and is very much in a beta state. Things will probably not work.
 
 ### Setup
 
