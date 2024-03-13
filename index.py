@@ -111,40 +111,55 @@ def code_project(image):
     else:
         return plate_number, score, None, None
 
-def plate_recognizer(image):
-    api_url = config['plate_recognizer'].get('api_url') or PLATE_RECOGIZER_BASE_URL
-    token = config['plate_recognizer']['token']
+def ocr_recognizer(image):
+#    api_url = config['ocr_recognizer'].get('api_url') or PLATE_RECOGIZER_BASE_URL
+#    token = config['ocr_recognizer']['token']
 
-    response = requests.post(
-        api_url,
-        data=dict(regions=config['plate_recognizer']['regions']),
-        files=dict(upload=image),
-        headers={'Authorization': f'Token {token}'}
-    )
+#    response = requests.post(
+#        api_url,
+#        data=dict(regions=config['plate_recognizer']['regions']),
+#        files=dict(upload=image),
+#        headers={'Authorization': f'Token {token}'}
+#    )
 
-    response = response.json()
-    _LOGGER.debug(f"response: {response}")
+#    response = response.json()
+#    _LOGGER.debug(f"response: {response}")
 
-    if response.get('results') is None:
-        _LOGGER.error(f"Failed to get plate number. Response: {response}")
-        return None, None, None, None
+#    if response.get('results') is None:
+#        _LOGGER.error(f"Failed to get plate number. Response: {response}")
+#        return None, None, None, None
 
-    if len(response['results']) == 0:
-        _LOGGER.debug(f"No plates found")
-        return None, None, None, None
+#    if len(response['results']) == 0:
+#        _LOGGER.debug(f"No plates found")
+#        return None, None, None, None
+ 
+    # Do gc and memory cleanup as Pytorch is memory intensive
+    gc.collect()
+    torch.cuda.ipc_collect()
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats()
+    torch.cuda.reset_accumulated_memory_stats()
 
-    plate_number = response['results'][0].get('plate')
-    score = response['results'][0].get('score')
+    reader = easyocr.Reader(['en'],gpu=True)
+
+
+    result = reader.readtext(image, canvas_size=1000,detail=0)
+
+    # Clean up reader object
+    del(reader)
     
-    watched_plate, watched_score, fuzzy_score = check_watched_plates(plate_number, response['results'][0].get('candidates'))
+    ocr_text= result
+    score = None
+    
+    watched_ocr, watched_score, fuzzy_score = check_watched_ocr(ocr_text)
     if fuzzy_score:
-        return plate_number, score, watched_plate, fuzzy_score
-    elif watched_plate: 
-        return plate_number, watched_score, watched_plate, None
+        return ocr_text, score, watched_ocr, fuzzy_score
+    elif watched_ocr: 
+        return ocr_text, ocr_score, watched_ocr, None
     else:
-        return plate_number, score, None, None
+        return ocr_text, score, None, None
 
-def check_watched_ocr(ocr_text, response):
+def check_watched_ocr(ocr_text):
     config_watched_ocr = config['frigate'].get('watched_ocr', [])
     if not config_watched_ocr:
         _LOGGER.debug("Skipping checking Watched OCR because watched_ocr is not set")
@@ -351,28 +366,26 @@ def is_duplicate_event(frigate_event_id):
 
     return False
 
-def get_plate(clean_snapshot):
+def get_ocr(clean_snapshot):
     # try to get plate number
-    plate_number = None
-    plate_score = None
+    orc_text = None
+    ocr_score = None
 
-    if config.get('plate_recognizer'):
-        plate_number, plate_score , watched_plate, fuzzy_score = plate_recognizer(clean_snapshot)
-    elif config.get('code_project'):
-        plate_number, plate_score, watched_plate, fuzzy_score = code_project(clean_snapshot)
+    if config.get('ocr_recognizer'):
+        ocr_text, ocr_score , watched_ocr, fuzzy_score = ocr_recognizer(clean_snapshot)
     else:
-        _LOGGER.error("Plate Recognizer is not configured")
+        _LOGGER.error("OCR Recognizer is not configured")
         return None, None, None, None
 
-    # check Plate Recognizer score
+    # check OCR Recognizer score
     min_score = config['frigate'].get('min_score')
     score_too_low = min_score and plate_score and plate_score < min_score
 
     if not fuzzy_score and score_too_low:
-        _LOGGER.info(f"Score is below minimum: {plate_score} ({plate_number})")
+        _LOGGER.info(f"Score is below minimum: {ocr_score} ({ocr_text})")
         return None, None, None, None
 
-    return plate_number, plate_score, watched_plate, fuzzy_score
+    return ocr_text, ocr_score, watched_ocr, fuzzy_score
 
 def store_plate_in_db(ocr_text, ocr_score, frigate_event_id, after_data, formatted_start_time):
     conn = sqlite3.connect(DB_PATH)
@@ -432,7 +445,7 @@ def on_message(client, userdata, message):
             return
         CURRENT_EVENTS[frigate_event_id] += 1
 
-    ocr_text, ocr_score, watched_ocr, fuzzy_score = get_plate(clean_snapshot)
+    ocr_text, ocr_score, watched_ocr, fuzzy_score = get_ocr(clean_snapshot)
     if ocr_text:
         start_time = datetime.fromtimestamp(after_data['start_time'])
         formatted_start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
