@@ -67,7 +67,7 @@ def set_sublabel(frigate_url, frigate_event_id, sublabel, score):
     if len(sublabel) > 20:
         sublabel = sublabel[:20]
 
-    sublabel = str(sublabel).upper() # plates are always upper cased
+    sublabel = 'OCR:' + str(sublabel).upper() # plates are always upper cased
 
     # Submit the POST request with the JSON payload
     payload = { "subLabel": sublabel }
