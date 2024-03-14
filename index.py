@@ -247,16 +247,16 @@ def check_invalid_event(before_data, after_data):
     return False
 
 def get_clean_snapshot(camera,frigate_event_id, frigate_url, cropped):
-    _LOGGER.debug(f"Getting snapshot for event: {frigate_event_id}, Crop: {cropped}")
+    _LOGGER.debug(f"Getting clean snapshot for event: {frigate_event_id}, Crop: {cropped}")
     clean_snapshot_url = f"{frigate_url}/clips/{camera}-{frigate_event_id}-clean.png"
     _LOGGER.debug(f"event URL: {clean_snapshot_url}")
 
     # get snapshot
-    response = requests.get(clean_snapshot_url, params={ "crop": cropped, "quality": 95 })
+    response = requests.get(clean_snapshot_url, params={ "crop": cropped, "quality": 100 })
 
     # Check if the request was successful (HTTP status code 200)
     if response.status_code != 200:
-        _LOGGER.error(f"Error getting clean snapshot: {response.status_code}")
+        _LOGGER.error(f"Error getting clean snapshot (event still in progress): {response.status_code}")
         return
 
     return response.content
@@ -390,7 +390,7 @@ def on_message(client, userdata, message):
         del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
         return
 
-    _LOGGER.debug(f"Getting OCR for event: {frigate_event_id}")
+    _LOGGER.debug(f"Using EasyOCR on finished event: {frigate_event_id}")
     if frigate_event_id in CURRENT_EVENTS:
         if config['frigate'].get('max_attempts', 0) > 0 and CURRENT_EVENTS[frigate_event_id] > config['frigate'].get('max_attempts', 0):
             _LOGGER.debug(f"Maximum number of AI attempts reached for event {frigate_event_id}: {CURRENT_EVENTS[frigate_event_id]}")
