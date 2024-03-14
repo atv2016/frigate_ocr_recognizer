@@ -417,7 +417,7 @@ def on_message(client, userdata, message):
             frigate_event_id=frigate_event_id,
             plate_number=watched_ocr if watched_ocr else ocr_text
         )
-del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
+    del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
 
 def setup_db():
     conn = sqlite3.connect(DB_PATH)
