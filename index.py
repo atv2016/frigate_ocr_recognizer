@@ -256,7 +256,7 @@ def get_clean_snapshot(camera,frigate_event_id, frigate_url, cropped):
 
     # Check if the request was successful (HTTP status code 200)
     if response.status_code != 200:
-        _LOGGER.error(f"Error getting clean snapshot (event still in progress): {response.status_code}")
+        _LOGGER.error(f"Error getting clean snapshot (event {frigate_event_id} still in progress): {response.status_code}")
         return
 
     return response.content
