@@ -345,7 +345,7 @@ def store_plate_in_db(ocr_text, ocr_score, frigate_event_id, after_data, formatt
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    _LOGGER.info(f"Storing OCR text in database: {ocr_text} with score: {ocr_score}")
+    _LOGGER.info(f"{ocr_text} extracted for {after_data['camera']}, frigate_event_id} with score: {ocr_score}")
 
     cursor.execute("""INSERT INTO plates (detection_time, score, plate_number, frigate_event, camera_name) VALUES (?, ?, ?, ?, ?)""",
         (str(formatted_start_time), str(ocr_score), str(ocr_text), str(frigate_event_id), str(after_data['camera']))
