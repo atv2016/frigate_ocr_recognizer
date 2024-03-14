@@ -387,7 +387,6 @@ def on_message(client, userdata, message):
     clean_snapshot = get_clean_snapshot(camera,frigate_event_id, frigate_url, True)
 
     if not clean_snapshot:
-        del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
         return
 
     _LOGGER.debug(f"Using EasyOCR on finished event: {frigate_event_id}")
@@ -418,6 +417,7 @@ def on_message(client, userdata, message):
             frigate_event_id=frigate_event_id,
             plate_number=watched_ocr if watched_ocr else ocr_text
         )
+del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
 
 def setup_db():
     conn = sqlite3.connect(DB_PATH)
