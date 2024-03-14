@@ -256,7 +256,7 @@ def get_clean_snapshot(camera,frigate_event_id, frigate_url, cropped):
 
     # Check if the request was successful (HTTP status code 200)
     if response.status_code != 200:
-        _LOGGER.error(f"Error getting clean snapshot (event {frigate_event_id} still in progress): {response.status_code}")
+        _LOGGER.error(f"Error while getting clean snapshot for {camera}, event {frigate_event_id} still in progress): {response.status_code}")
         return
 
     return response.content
@@ -330,7 +330,7 @@ def get_ocr(clean_snapshot):
 
     # check OCR Recognizer score
     min_score = config['frigate'].get('min_score')
-    score_too_low = min_score and plate_score and plate_score < min_score
+    score_too_low = min_score and ocr_score and ocr_score < min_score
 
     if not fuzzy_score and score_too_low:
         _LOGGER.info(f"Score is below minimum: {ocr_score} ({ocr_text})")
