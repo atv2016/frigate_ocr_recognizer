@@ -256,7 +256,7 @@ def get_clean_snapshot(camera,frigate_event_id, frigate_url, cropped):
 
     # Check if the request was successful (HTTP status code 200)
     if response.status_code != 200:
-        _LOGGER.error(f"Error while getting clean snapshot for {camera}, event {frigate_event_id} still in progress): {response.status_code}")
+        _LOGGER.info(f"Clean snapshot for {camera} not available yet, event {frigate_event_id} still in progress): {response.status_code}")
         return
 
     return response.content
@@ -343,7 +343,7 @@ def store_plate_in_db(ocr_text, ocr_score, frigate_event_id, after_data, formatt
     cursor = conn.cursor()
 
     _LOGGER.info(f"Storing OCR text in database: {ocr_text} with score: {ocr_score}")
-
+    print(type(formatted_start_time),type(ocr_score),type(ocr_text),type(frigate_event_id),type(after_data['camera']))
     cursor.execute("""INSERT INTO plates (detection_time, score, plate_number, frigate_event, camera_name) VALUES (?, ?, ?, ?, ?)""",
         (formatted_start_time, ocr_score, ocr_text, frigate_event_id, after_data['camera'])
     )
