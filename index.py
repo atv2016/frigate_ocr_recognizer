@@ -77,7 +77,7 @@ def set_sublabel(frigate_url, frigate_event_id, sublabel, score):
     if(score):
         percent_score = "{:.1%}".format(score)
     else: # Remove all scoring or fuzzy logic at some point as we dont need any of that for OCR
-        score=None
+        percent_score=None
 
     # Check for a successful response
     if response.status_code == 200:
