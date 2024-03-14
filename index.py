@@ -418,7 +418,7 @@ def on_message(client, userdata, message):
             after_data=after_data,
             frigate_url=frigate_url,
             frigate_event_id=frigate_event_id,
-            plate_number=watched_ocr if watched_ocr else ocr_text
+            ocr_text=watched_ocr if watched_ocr else ocr_text
         )
     del CURRENT_EVENTS[frigate_event_id] # remove existing id from current events due to clean snapshot failure - will try again next frame
 
