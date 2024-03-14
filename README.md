@@ -41,14 +41,14 @@ frigate:
     - back_door
 ```
 
-If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`.
+If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive.
 
 ```
 
 ### Running
 
 ```bash
-docker run -v /path/to/config:/config -e TZ=Europe/London -it --rm --name frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
+docker run -v /path/to/config:/config -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged --rm --name frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
 ```
 
 or using docker-compose:
