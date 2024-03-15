@@ -142,3 +142,5 @@ condition:
 ```
 
 And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file. In theory, you could automate your house by holding up a sign in front of the camera (LIGHTS OFF or ALARM, or HELP) and you could then have HA perform it's automations.
+
+Because we currently only work on the high resolution and clean snapshot, we have to wait for the event to end (frigate does not save the clean snapshot until after). This has implications obviously for automations, as the clean snapshot won't be available until the event ends. This means your automation won't run until the events ends either, so there might a slight delay, but it all depends on your use case and how you're event detection is configured in frigate. I will try and do some more tests on the snapshot, but initial tests showed it was not suitable for text recognition.
