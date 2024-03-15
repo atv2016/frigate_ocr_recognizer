@@ -2,7 +2,9 @@
 
 Identify OCR text using EasyOCR and Pytorch and add them as sublabels to [blakeblackshear/frigate](https://github.com/blakeblackshear/frigate) using Frigate events API and MQTT.
 
-This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work.
+This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work as they should.
+
+Note the image size is currently very large +- 10Gb, because opencv and PyTorch being included. I will look at minimizing this at some point.
 
 ### Setup
 
@@ -124,6 +126,7 @@ If a watched ocr text is found in the list of ocr returned by easyOCR, the respo
 
 A simple way of automating would be to trigger on the frigate/events topic :
 
+```
 alias: Frigate OCR
 description: ""
 trigger:
@@ -134,5 +137,6 @@ condition:
     value_template: |-
       condition:
         - "{{ trigger.payload_json['after']['sublabel'] | regex_search(''PRIME'') }}"
+```
 
 And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file.
