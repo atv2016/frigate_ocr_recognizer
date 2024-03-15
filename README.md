@@ -41,7 +41,11 @@ frigate:
     - back_door
 ```
 
-If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive.
+If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive. It will also work best on high resolution images (this is why we take the event once finalized, rather then the low resolution snapshot) or on large letters, like on the side of a car or van.
+
+Also keep in mind that it will detect the object, and then keep updating the snapshot per frame until the event is finalized. So if the object is not fully stationary (like a person), you might not get the most ideal snapsnot for text recognition (e.g. with a person it might detect you backwards and miss the text you are holding up.
+
+It is also recommended to disabled timestamps or logos on the cameras you are using as they will be part of the recognition. When text has been extracted, it will be added to the sublabel in frigate, and prefaced with OCR (on the sublabel filter it will take the last 30 characters or so).
 
 ```
 
@@ -115,3 +119,20 @@ frigate:
 ```
 
 If a watched ocr text is found in the list of ocr returned by easyOCR, the response will be updated to use that text. The original ocr will be added to the MQTT response as an additional `original_ocr` field.
+
+### Automations
+
+A simple way of automating would be to trigger on the frigate/events topic :
+
+alias: Frigate OCR
+description: ""
+trigger:
+  - platform: mqtt
+    topic: frigate/events
+condition:
+  - condition: template
+    value_template: |-
+      condition:
+        - "{{ trigger.payload_json['after']['sublabel'] | regex_search(''PRIME'') }}"
+
+And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file.
