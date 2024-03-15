@@ -43,7 +43,9 @@ frigate:
     - back_door
 ```
 
-If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive. It will also work best on high resolution images (this is why we take the event once finalized, rather then the low resolution snapshot) or on large letters, like on the side of a car or van.
+If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive. It will also work best on high resolution images (this is why by default we take the event once finalized, rather then the low resolution snapshot) or on large letters, like on the side of a car or van. 
+
+If you do want to use snapshots, you have to make sure to not set the height, or crop the image, as well as set bounding_box: false so you get the full resolution and no extra text on the object detection which might confuse the OCR. The advantage of using snapshots, is that you will get faster detection and your automations will thus run faster.
 
 Also keep in mind that it will detect the object, and then keep updating the snapshot per frame until the event is finalized. So if the object is not fully stationary (like a person), you might not get the most ideal snapsnot for text recognition (e.g. with a person it might detect you backwards and miss the text you are holding up.
 
@@ -141,4 +143,4 @@ condition:
 
 And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file. In theory, you could automate your house by holding up a sign in front of the camera (LIGHTS OFF or ALARM, or HELP) and you could then have HA perform it's automations.
 
-Because we currently only work on the high resolution and clean snapshot, we have to wait for the event to end (frigate does not save the clean snapshot until after). This has implications obviously for automations, as the clean snapshot won't be available until the event ends. This means your automation won't run until the events ends either, so there might a slight delay, but it all depends on your use case and how you're event detection is configured in frigate. I will try and do some more tests on the snapshot, but initial tests showed it was not suitable for text recognition.
+Because we currently only work on the high resolution and clean snapshot, we have to wait for the event to end (frigate does not save the clean snapshot until after). This has implications obviously for automations, as the clean snapshot won't be available until the event ends. This means your automation won't run until the events ends either, so there might a slight delay, but it all depends on your use case and how you're event detection is configured in frigate.
