@@ -136,9 +136,7 @@ trigger:
     topic: frigate/ocr_recognizer
 condition:
   - condition: template
-    value_template: |-
-      condition:
-        - "{{ trigger.payload_json['ocr_text'] | regex_search('PRINE') }}""
+    value_template: "{{ trigger.payload_json['ocr_text'] | regex_search('PRIME') }}"
 ```
 
 And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file. In theory, you could automate your house by holding up a sign in front of the camera (LIGHTS OFF or ALARM, or HELP) and you could then have HA perform it's automations.
