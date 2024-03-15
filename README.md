@@ -49,6 +49,8 @@ Also keep in mind that it will detect the object, and then keep updating the sna
 
 It is also recommended to disable timestamps or logos on the cameras you are using as they will be part of the recognition. When text has been extracted, it will be added to the sublabel in frigate, and prefaced with OCR (on the sublabel filter it will take the last 30 characters or so).
 
+Finally, currently the canvas_size given to EasyOCR is 1000. If you have the available GPU memory, you can leave that out for better image. I have to share the GPU with frigate and compreface, so i only have a little left i can use. But the larger the image, and the higher the resolution, the better. When you do change it, make sure to test if it works on a variety of your images as changing any setting to EasyOCR or given image, can have detrimental effects on text recognition. Sometimes making the canvas larger might have a worse effect, especially if you combine it with other EasyOCR parameters. My camera have a 1080P stream, but it would be interesting to see what results a 4K camera would give.
+
 ```
 
 ### Running
@@ -139,4 +141,4 @@ condition:
         - "{{ trigger.payload_json['ocr_text'] | regex_search('PRINE') }}""
 ```
 
-And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file.
+And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file. In theory, you could automate your house by holding up a sign in front of the camera (LIGHTS OFF or ALARM, or HELP) and you could then have HA perform it's automations.
