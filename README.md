@@ -131,12 +131,12 @@ alias: Frigate OCR
 description: ""
 trigger:
   - platform: mqtt
-    topic: frigate/events
+    topic: frigate/ocr_recognizer
 condition:
   - condition: template
     value_template: |-
       condition:
-        - "{{ trigger.payload_json['after']['sublabel'] | regex_search(''PRIME'') }}"
+        - "{{ trigger.payload_json['ocr_text'] | regex_search('PRINE') }}"
 ```
 
 And attach the appropriate action to it, like TTS or whatever you would like. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file.
