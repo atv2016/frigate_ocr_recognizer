@@ -250,12 +250,18 @@ def check_invalid_event(before_data, after_data):
     return False
 
 def get_clean_snapshot(camera,frigate_event_id, frigate_url, cropped):
-    _LOGGER.debug(f"Getting clean snapshot for event: {frigate_event_id}, Crop: {cropped}")
-    clean_snapshot_url = f"{frigate_url}/clips/{camera}-{frigate_event_id}-clean.png"
-    _LOGGER.debug(f"event URL: {clean_snapshot_url}")
+    
+    if not config['frigate'].get('use_clean_snapshots', False):
+        LOGGER.debug(f"Getting (clean) snapshot for event: {frigate_event_id}, Crop: {cropped}")
+        snapshot_url = f"{frigate_url}/clips/{camera}-{frigate_event_id}-clean.png"
+    else:
+        _LOGGER.debug(f"Getting snapshot for event: {frigate_event_id}, Crop: {cropped}")
+        snapshot_url = f"{frigate_url}/api/events/{frigate_event_id}/snapshot.jpg
+       
+    _LOGGER.debug(f"event URL: {snapshot_url}")
 
     # get snapshot
-    response = requests.get(clean_snapshot_url, params={ "crop": cropped, "quality": 100 })
+    response = requests.get(snapshot_url, params={ "crop": cropped, "quality": 100 })
 
     # Check if the request was successful (HTTP status code 200)
     if response.status_code != 200:
