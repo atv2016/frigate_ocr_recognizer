@@ -253,7 +253,7 @@ def get_clean_snapshot(camera,frigate_event_id, frigate_url, cropped):
     
     if not config['frigate'].get('use_clean_snapshots', False):
         _LOGGER.debug(f"Getting snapshot for event: {frigate_event_id}, Crop: {cropped}")
-        snapshot_url = f"{frigate_url}/api/events/{frigate_event_id}/snapshot.jpg"
+        snapshot_url = f"{frigate_url}/api/events/{frigate_event_id}/snapshot.jpg?bbox=0" # Just to make sure we set bbox to 0
     else:
         _LOGGER.debug(f"Getting (clean) snapshot for event: {frigate_event_id}, Crop: {cropped}")
         snapshot_url = f"{frigate_url}/clips/{camera}-{frigate_event_id}-clean.png"
