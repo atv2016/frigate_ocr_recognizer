@@ -84,11 +84,11 @@ When you do change it and you have customised EasyOCR recognition (i would not r
 ### Building
 This is only needed if you are re-building your own image because you changed the source.
 ```
-sudo docker build -t <docker namespace>/frigate_ocr_recognizer:v1.0.0-yourtag .
+sudo docker build -t <docker namespace>/frigate_ocr_recognizer:v1.0.0-yourtag . --no-cache
 ```
 If using semantic versioning, or do:
 ```
-sudo docker build -t <docker namespace>/frigate_ocr_recognizer .
+sudo docker build -t <docker namespace>/frigate_ocr_recognizer . --no-cache
 ```
 To get the latest tag assigned by docker. Note that it is not recommended to use the latest tag but rather a version tag as per the first example if you don't want things to break unexpectedly.
 
