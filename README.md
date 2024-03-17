@@ -74,13 +74,15 @@ It is also recommended to disable any logos on the cameras you are using as they
 Finally, currently the canvas_size given to EasyOCR is 1000. If you have the available GPU memory, you can leave that out for better image. I have to share the GPU with frigate and compreface, so i only have a little left i can use. But the larger the image, and the higher the resolution, the better. When you do change it, make sure to test if it works on a variety of your images as changing any setting to EasyOCR or given image, can have detrimental effects on text recognition. Sometimes making the canvas larger might have a worse effect, especially if you combine it with other EasyOCR parameters. My camera's have a 1080P stream, but it would be interesting to see what results a 4K camera would give.
 
 ### Building
+This is only needed if you are re-building your own image because you changed the source.
 ```
-sudo docker build -t frigate_ocr_recognizer:v1.0.0-beta .
+sudo docker build -t frigate_ocr_recognizer:v1.0.0-yourtag .
 ```
 ### Running
+This assumes you are using the docker hub registry image. If you build your own you need to refer to your image name at the end of the command.
 
 ```bash
-docker run -v /path/to/config:/config -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged --rm --name frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
+docker run -v /path/to/config:/config -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged --rm --name frigate_ocr_recognizer alefveld/frigate_ocr_recognizer:latest
 ```
 
 or using docker-compose:
@@ -88,7 +90,7 @@ or using docker-compose:
 ```yml
 services:
   frigate_ocr_recognizer:
-    image: atv2016/frigate_ocr_recognizer:latest
+    image: alefveld/frigate_ocr_recognizer:latest
     container_name: frigate_ocr_recognizer
     volumes:
       - /path/to/config:/config
@@ -97,7 +99,7 @@ services:
       - TZ=Europe/London
 ```
 
-https://hub.docker.com/r/atv2016/frigate_ocr_recognizer
+https://hub.docker.com/r/alefveld/frigate_ocr_recognizer
 
 ### Debugging
 
