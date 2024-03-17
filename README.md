@@ -2,9 +2,9 @@
 
 Identify OCR text using EasyOCR and Pytorch and add them as sublabels to [blakeblackshear/frigate](https://github.com/blakeblackshear/frigate) using Frigate events API and MQTT.
 
-This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work as they should™️.
+This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work as they should.
 
-Note the image size is currently very large +- 10Gb, because OpenCv, PyTorch and Nvidia CUDA being included. I will look at minimizing this at some point but no promises. You will need a installation of Frigate, a MQTT broker like Mosquito and optionally you can have Home Assistant installed if you want to automate on it (or something else).
+Note the image size is currently very large +- 10Gb, because OpenCV, PyTorch and Nvidia CUDA being included. I will look at minimizing this at some point but no promises. You will need a installation of Frigate, a MQTT broker like Mosquito and optionally you can have Home Assistant installed if you want to automate on it (or something else).
 
 ### Example
 
@@ -50,11 +50,11 @@ frigate:
     - back_door
 ```
 
-If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive. It will also work best on high resolution images, or on large letters, like on the side of a car or van, with no other text other then the object of focus. This is why we advocate to use either snapshots (the default) but with no crop, height restrictions, timestamp, and bounding box configured or use the use_clean_snapshots option in the config.yml described below. The latter will take a little longer for the event to finalize and OCR to kick in, but you will get better results on high resolution images if you don't want to change your snapshots setting, and you don't need to configure anything extra as with the use_clean_snapshots=false (the default) option.
+If no objects are specified in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive. It will also work best on high resolution images, or on large letters, like on the side of a car or van, with no other text other then the object of focus. This is why we advocate to use either snapshots (the default) but with no crop, height restrictions, timestamp, and bounding box configured or use the use_clean_snapshots option in the config.yml described below. The latter will take a little longer for the event to finalize and OCR to kick in, but you will get better results on high resolution images if you don't want to change your snapshots setting, and you don't need to configure anything extra as with the use_clean_snapshots=false (the default) option.
 
-In some cases, even though you want to detect cars, it is beneficial to also detect persons because if this person gets out of the car or van that is the object of interest and walks in front of your camera, or any person, that has your object still in the background, the object by now is most likely stationary and you get a better frame and thus better text recognition. Moving vehicles don't always produce the best frames. Ofcourse adding person as an object will somewhat increase your processing as it will do all person objects, and process all events that match these objects (cars and person), but you the end result is better recognition. Another option if you want to detect almost anything, is to lower the score to 0.1, you will most likely get a hit on almost anything (e.g. any motion).
+In some cases, even though you want to detect cars, it is beneficial to also detect persons because if this person gets out of the car or van that is the object of interest and walks in front of your camera, or any person, that has your object still in the background, the object by now is most likely stationary and you get a better frame and thus better text recognition. Moving vehicles don't always produce the best frames. Ofcourse adding person as an object will somewhat increase your processing as it will do all person objects, and process all events that match these objects (cars and person), but the end result is better recognition. Another option if you want to detect almost anything, is to lower the object score to 0.1, you will most likely get a hit on almost anything (e.g. any motion).
 
-As mentioned, if you do want to use snapshots, you have to make sure to not set the height, or crop the image, as well as set bounding_box: false (don't just comment it out as it will then use the default value) and timestamp to false so you get the full resolution and no extra text on the object detection which might confuse the OCR. The advantage of using snapshots, is that you will get faster detection and your automations will thus run faster.
+As mentioned, if you do want to use snapshots, you have to make sure to not set the height in frigate for the camera, or crop the image, as well as set bounding_box: false (don't just comment it out as it will then use the default value) and timestamp to false so you get the full resolution and make sure there is no extra text on the object detection which might confuse the OCR. The advantage of using snapshots, is that you will get faster detection and your automations will thus run faster.
 
 To use snapshots (the default option) you have to set:
 
@@ -71,13 +71,15 @@ In your frigate configuration file:
       crop: false
       #height: 500
 ```
-If you set ```use_clean_snapshots= true``` then you have don't have to change anything in your frigate configuration.
+If you set ```use_clean_snapshots= true``` then you don't have to change anything in your frigate configuration.
 
 Also keep in mind that it will detect the object, and then keep updating the snapshot per frame until the event is finalized. So if the object is not fully stationary (like a person), you might not get the most ideal snapsnot for text recognition (e.g. with a person it might detect you backwards and miss the text you are holding up.
 
 It is also recommended to disable any logos on the cameras you are using as they will be part of the recognition. When text has been extracted, it will be added to the sublabel in frigate, and prefaced with OCR (on the sublabel filter it will take the last 30 characters or so).
 
-Finally, currently the canvas_size given to EasyOCR is 1000. If you have the available GPU memory, you can leave that out for better image. I have to share the GPU with frigate and compreface, so i only have a little left i can use. But the larger the image, and the higher the resolution, the better. When you do change it, make sure to test if it works on a variety of your images as changing any setting to EasyOCR or given image, can have detrimental effects on text recognition. Sometimes making the canvas larger might have a worse effect, especially if you combine it with other EasyOCR parameters. My camera's have a 1080P stream, but it would be interesting to see what results a 4K camera would give.
+Finally, currently the canvas_size given to EasyOCR is 1000. If you have the available GPU memory, you can leave that out for better image. I have to share the GPU with frigate and compreface, so i only have a little left i can use. But the larger the image, and the higher the resolution, the better. My camera's have a 1080P stream, but it would be interesting to see what results a 4K camera would give. 
+
+When you do change it and you have customised EasyOCR recognition (i would not recommend it, but see bottom of this article) make sure to test if it works on a variety of your images as changing any setting to EasyOCR or given image, can have detrimental effects on text recognition. Sometimes making the canvas larger (or smaller) might have a worse effect, especially if you combine it with other EasyOCR parameters, and when you do finetune it more with said parameters, even a minor thing as removing the timestamps or logo's can affect recognition. 
 
 ### Building
 This is only needed if you are re-building your own image because you changed the source.
@@ -198,10 +200,25 @@ condition:
     value_template: "{{ trigger.payload_json['ocr_text'] | regex_search('PRIME|PRIME') }}"
 ```
 
-And attach the appropriate action to it, like TTS or whatever you would like. Some of regex_search expression i use are PRIME,DPD, ROYAL MAIL,MORRISONS, THAMES WATER etc. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file but i have not looked at that possibility yet (although the return MQTT topic does get updated as per plate recognizer). In theory, you could automate your house by holding up a sign in front of the camera (LIGHTS OFF or ALARM, or HELP) and you could then have HA perform it's automations.
+And attach the appropriate action to it, like TTS or whatever you would like. Some of regex_search expression i use are PRIME,DPD, ROYAL MAIL,MORRISONS, THAMES WATER etc. Currently every recognised text is in upper case, so make sure you search on those when using regular expression statements. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file but i have not looked at that possibility yet (although the return MQTT topic does get updated as per plate recognizer). It is <ins>fully achievable</ins> that you could automate your house by holding up a sign in front of the camera (LIGHTS OFF or ALARM, or HELP) and you could then have HA perform it's automations.
 
 Remember, if you use the ```use_clean_snapshots=false``` option you will have to wait until the event has signaled it's last message.
-This has implications obviously for automations, as the clean snapshot won't be available until the event has finished (as opposed to a regular API snapshot which will be immediately available). This means your automation won't run until the events ends either, so there might a slight delay, but it all depends on your use case and also how you're event detection is configured in frigate.
+This has implications obviously for automations, as the clean snapshot won't be available until the event has finished (as opposed to a regular API snapshot which will be immediately available). This means your automation won't run until the events ends either, so there might a slight delay, but in the end it all depends on your use case and also how your event detection is configured in frigate.
+
+### EasyOCR optimization
+
+You can give a variety of options to EasyOCR, and you can test them out by using the easy.py script that is included in the repo. Look on the [JadedAI](https://github.com/JaidedAI/EasyOCR) website for the full API reference. You can adjust batch size, scale, margin, canvas and a whole lot more. That said, i found the default to work the best for my needs in the end.
+
+Open easy.py and update:
+```
+result = reader.readtext(sys.argv[1], canvas_size=1000,detail=0)
+```
+To whatever parameters you want to add to the call. Save the file, and then run it like so:
+
+```
+python3 easy.py <filepath (can be http)>
+```
+And it will return what it found. It is very bare bones so there is no error handling or anything. But it serves as a quick way to test if an image works with your parameters.
 
 ### Copyright
 [EasyOCR](https://github.com/JaidedAI/EasyOCR) is copyright EasyOCR and [JadedAI](https://jaded.ai) and comes with a Apache 2.0 license, which is included in this repository as custom. All files in this repository are also released under that same license, again as per custom.
