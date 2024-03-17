@@ -4,7 +4,7 @@ Identify OCR text using EasyOCR and Pytorch and add them as sublabels to [blakeb
 
 This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work as they should.
 
-Note the image size is currently very large +- 10Gb, because opencv and PyTorch being included. I will look at minimizing this at some point.
+Note the image size is currently very large +- 10Gb, because OpenCv, PyTorch and Nvidia CUDA being included. I will look at minimizing this at some point.
 
 ### Setup
 
