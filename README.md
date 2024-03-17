@@ -6,6 +6,10 @@ This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://githu
 
 Note the image size is currently very large +- 10Gb, because OpenCv, PyTorch and Nvidia CUDA being included. I will look at minimizing this at some point but no promises. You will need a installation of Frigate, a MQTT broker like Mosquito and optionally you can have Home Assistant installed if you want to automate on it (or something else).
 
+### Example
+
+![Screenshot 2024-03-17 at 18 45 51](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/cbf7abb5-9e21-4d00-91f5-ae709c5b7c5d)
+
 ### Setup
 
 Create a `config.yml` file in your docker volume with the following contents:
