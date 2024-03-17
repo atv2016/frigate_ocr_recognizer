@@ -76,25 +76,31 @@ Finally, currently the canvas_size given to EasyOCR is 1000. If you have the ava
 ### Building
 This is only needed if you are re-building your own image because you changed the source.
 ```
-sudo docker build -t frigate_ocr_recognizer:v1.0.0-yourtag .
+sudo docker build -t <docker namespace>/frigate_ocr_recognizer:v1.0.0-yourtag .
 ```
+If using semantic versioning, or do:
+```
+sudo docker build -t <docker namespace>/frigate_ocr_recognizer .
+```
+To get the latest tag assigned by docker. Note that it is not recommended to use the latest tag but rather a version tag as per the first example if you don't want things to break unexpectedly.
+
 Optional: 
-If you want to upload to docker public registry
+If you want to upload to docker public registry using a semantic tag (or leave it out to get the latest tag).
 ```
-sudo docker build -t <yourrepo>/frigate_ocr_recognizer:v1.0.0-yourtag .
+sudo docker build -t <docker namespace>/frigate_ocr_recognizer:v1.0.0-yourtag .
 sudo docker login
-sudo docker push <yourrepo/frigate_ocr_recognizer:v1.0.0-yourtag
+sudo docker push <docker namespace/frigate_ocr_recognizer:v1.0.0-yourtag
 ```
 ### Running
 If you just build your own image without preparing it for docker public registry:
 ```
-sudo docker run -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged -v ./:/config --rm frigate_ocr_recognizer:v1.0.0-yourtag
+sudo docker run -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged -v ./:/config --rm frigate_ocr_recognizer:v1.0.0-yourtag (or latest)
 ```
-Otherwise if you build your own and want to use the image from the docker public regsitry, you need to refer to your image name at the end of the command.
+Otherwise if you build your own and want to use the image from the docker public regsitry, you need to preface your docker namespace at the beginning of your image name plus tag command.
 
 ```bash
 sudo docker run -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged -v ./:/config --rm
-frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
+frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:v1.0.0-yourtag (or latest)
 ```
 or using docker-compose:
 
@@ -110,7 +116,7 @@ services:
       - TZ=Europe/London
 ```
 
-https://hub.docker.com/r/alefveld/frigate_ocr_recognizer
+https://hub.docker.com/r/atv2016/frigate_ocr_recognizer
 
 ### Debugging
 
