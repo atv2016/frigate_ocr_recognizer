@@ -108,12 +108,21 @@ or using docker-compose:
 services:
   frigate_ocr_recognizer:
     image: atv2016/frigate_ocr_recognizer:latest
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    privileged: true
     container_name: frigate_ocr_recognizer
     volumes:
-      - /path/to/config:/config
+      - ./:/config
     restart: unless-stopped
     environment:
       - TZ=Europe/London
+      - NVIDIA_DRIVER_CAPABILITIES=all
 ```
 
 https://hub.docker.com/r/atv2016/frigate_ocr_recognizer
