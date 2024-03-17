@@ -132,9 +132,11 @@ services:
       - TZ=Europe/London
       - NVIDIA_DRIVER_CAPABILITIES=all
 ```
+And execute:
+```
 sudo docker-compose up -d
-
-https://hub.docker.com/r/atv2016/frigate_ocr_recognizer
+```
+[Docker repository](https://hub.docker.com/r/atv2016/frigate_ocr_recognizer)
 
 ### Debugging
 
