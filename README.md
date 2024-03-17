@@ -88,12 +88,13 @@ sudo docker push <yourrepo/frigate_ocr_recognizer:v1.0.0-yourtag
 ### Running
 If you just build your own image without preparing it for docker public registry:
 ```
-sudo docker run -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged -v ./:/config frigate_ocr_recognizer:v1.0.0-beta
+sudo docker run -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged -v ./:/config --rm frigate_ocr_recognizer:v1.0.0-yourtag
 ```
 Otherwise if you build your own and want to use the image from the docker public regsitry, you need to refer to your image name at the end of the command.
 
 ```bash
-docker run -v /path/to/config:/config -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged --rm --name frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
+sudo docker run -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged -v ./:/config --rm
+frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
 ```
 or using docker-compose:
 
