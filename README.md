@@ -163,3 +163,6 @@ And attach the appropriate action to it, like TTS or whatever you would like. So
 
 Remember, if you use the ```use_clean_snapshots=false``` option you will have to wait until the event has signaled it's last message.
 This has implications obviously for automations, as the clean snapshot won't be available until the event has finished (as opposed to a regular API snapshot which will be immediately available). This means your automation won't run until the events ends either, so there might a slight delay, but it all depends on your use case and also how you're event detection is configured in frigate.
+
+### Copyright
+[https://github.com/JaidedAI/EasyOCR](EasyOCR) is copyright EasyOCR and JadedAI and comes with a Apache 2.0 license, which is included in this repository as custom. All files in this repository are also released under that same license, again as per custom.
