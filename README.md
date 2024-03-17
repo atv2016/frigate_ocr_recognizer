@@ -78,19 +78,29 @@ This is only needed if you are re-building your own image because you changed th
 ```
 sudo docker build -t frigate_ocr_recognizer:v1.0.0-yourtag .
 ```
+Optional: 
+If you want to upload to docker public registry
+```
+sudo docker build -t <yourrepo>/frigate_ocr_recognizer:v1.0.0-yourtag .
+sudo docker login
+sudo docker push <yourrepo/frigate_ocr_recognizer:v1.0.0-yourtag
+```
 ### Running
-This assumes you are using the docker hub registry image. If you build your own you need to refer to your image name at the end of the command.
+If you just build your own image without preparing it for docker public registry:
+```
+sudo docker run -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged -v ./:/config frigate_ocr_recognizer:v1.0.0-beta
+```
+Otherwise if you build your own and want to use the image from the docker public regsitry, you need to refer to your image name at the end of the command.
 
 ```bash
-docker run -v /path/to/config:/config -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged --rm --name frigate_ocr_recognizer alefveld/frigate_ocr_recognizer:latest
+docker run -v /path/to/config:/config -e TZ=Europe/London -it --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all --privileged --rm --name frigate_ocr_recognizer atv2016/frigate_ocr_recognizer:latest
 ```
-
 or using docker-compose:
 
 ```yml
 services:
   frigate_ocr_recognizer:
-    image: alefveld/frigate_ocr_recognizer:latest
+    image: atv2016/frigate_ocr_recognizer:latest
     container_name: frigate_ocr_recognizer
     volumes:
       - /path/to/config:/config
