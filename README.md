@@ -158,7 +158,7 @@ trigger:
     topic: frigate/ocr_recognizer
 condition:
   - condition: template
-    value_template: "{{ trigger.payload_json['ocr_text'] | regex_search('PRIME') }}"
+    value_template: "{{ trigger.payload_json['ocr_text'] | regex_search('PRIME|PRIME') }}"
 ```
 
 And attach the appropriate action to it, like TTS or whatever you would like. Some of regex_search expression i use are PRIME,DPD, ROYAL MAIL,MORRISONS, THAMES WATER etc. Possibly in the future one could trigger on the watched_ocr string defined in the docker compose file but i have not looked at that possibility yet (although the return MQTT topic does get updated as per plate recognizer). In theory, you could automate your house by holding up a sign in front of the camera (LIGHTS OFF or ALARM, or HELP) and you could then have HA perform it's automations.
