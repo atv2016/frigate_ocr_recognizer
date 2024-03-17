@@ -74,7 +74,10 @@ It is also recommended to disable any logos on the cameras you are using as they
 Finally, currently the canvas_size given to EasyOCR is 1000. If you have the available GPU memory, you can leave that out for better image. I have to share the GPU with frigate and compreface, so i only have a little left i can use. But the larger the image, and the higher the resolution, the better. When you do change it, make sure to test if it works on a variety of your images as changing any setting to EasyOCR or given image, can have detrimental effects on text recognition. Sometimes making the canvas larger might have a worse effect, especially if you combine it with other EasyOCR parameters. My camera's have a 1080P stream, but it would be interesting to see what results a 4K camera would give.
 
 ```
-
+### Building
+```
+sudo docker build -t frigate_ocr_recognizer:v1.0.0-beta .
+```
 ### Running
 
 ```bash
