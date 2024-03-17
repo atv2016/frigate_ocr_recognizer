@@ -27,7 +27,7 @@ config = None
 first_message = True
 _LOGGER = None
 
-VERSION = '1.8.13'
+VERSION = '1.0.4'
 
 CONFIG_PATH = '/config/config.yml'
 DB_PATH = '/config/frigate_ocr_recogizer.db'
