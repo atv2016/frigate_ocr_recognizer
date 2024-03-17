@@ -23,6 +23,7 @@ frigate:
     - driveway_camera
   objects:
     - car
+    - person
   min_score: .8
 ocr_recognizer:
   token: xxxxxxxxxx
@@ -45,7 +46,7 @@ frigate:
 
 If no objects are speficied in the Frigate options, it will default to `[motorcycle, car, bus]`. You can detect OCR on any object but it will be much more accurate on stationary objects and on events of short notice, as well as being less CPU intensive. It will also work best on high resolution images, or on large letters, like on the side of a car or van, with no other text other then the object of focus. This is why we advocate to use either snapshots (the default) but with no crop, height restrictions, timestamp, and bounding box configured or use the use_clean_snapshots option in the config.yml described below. The latter will take a little longer for the event to finalize and OCR to kick in, but you will get better results on high resolution images if you don't want to change your snapshots setting, and you don't need to configure anything extra as with the use_clean_snapshots=false (the default) option.
 
-In some cases, even though you want to detect cars, it is beneficial to also detect persons because if this person gets out of the car or van, the vehicle is most likely stationary and you get a better frame. Ofcourse adding person as an object will somewhat increase your processing as it will do all person objects, and process all events that match these objects (cars and person), but you get better recognition. Another option if you want to detect almost anything, is to lower the score to 0.1, you will most likely get a hit on almost anything (e.g. any motion).
+In some cases, even though you want to detect cars, it is beneficial to also detect persons because if this person gets out of the car or van that is the object of interest and walks in front of your camera, or any person, that has your object still in the background, the object by now is most likely stationary and you get a better frame and thus better text recognition. Ofcourse adding person as an object will somewhat increase your processing as it will do all person objects, and process all events that match these objects (cars and person), but you the end result is better recognition. Another option if you want to detect almost anything, is to lower the score to 0.1, you will most likely get a hit on almost anything (e.g. any motion).
 
 As mentioned, if you do want to use snapshots, you have to make sure to not set the height, or crop the image, as well as set bounding_box: false (don't just comment it out as it will then use the default value) and timestamp to false so you get the full resolution and no extra text on the object detection which might confuse the OCR. The advantage of using snapshots, is that you will get faster detection and your automations will thus run faster.
 
