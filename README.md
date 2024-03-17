@@ -10,6 +10,8 @@ Note the image size is currently very large +- 10Gb, because OpenCv, PyTorch and
 
 ![Screenshot 2024-03-17 at 18 45 51](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/cbf7abb5-9e21-4d00-91f5-ae709c5b7c5d)
 
+Above example shows a sublabel in Frigate with filled in recognised text. It also shows the importance of not having timestamps or other things on the screen, as they will also be recognised.
+
 ### Setup
 
 Create a `config.yml` file in your docker volume with the following contents:
