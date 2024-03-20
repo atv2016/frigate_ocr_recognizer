@@ -21,7 +21,7 @@ Above example shows a sublabel in Frigate with filled in recognised text. It als
    - Talk to your home automation from outside by showing text on a piece paper
    - On top of face recognition, add word recognition before the front door unlocks
    - Add a silent alarm and call for help when someone holds up a trigger word
-3. I only have low resolution<sub>1</sub> cameras and it can reliably detect text at 1-30 meters, depending on the size of the text. I will most likely be even better at long range or smaller text if you have even higher resolution camera's<sub>2</sub> (but remember your canvas size will grab a larger chunk of memory from your GPU).
+3. I only have low resolution<sub>1</sub> cameras and it can reliably detect text at 1-30 meters, depending on the size of the text. I will most likely be even better at long range or smaller text if you have even higher resolution camera's<sub>2</sub> (but remember your canvas size will grab a larger chunk of memory from your GPU<sub>3</sub>).
 4. Object detection is great, but not fool proof. Using it with OCR makes it even better and more foolproof for your automations. And if i had to choose OCR over object or even color detection, i would actually choose OCR first. Object detection fails often, unless you really dial in your parameters or upload your own models, for which you need a lot of pictures. As objects can look alike, whereas digits or letters are always unique. Ofcourse OCR needs a certain text size, which is why it is ideal for vans or trucks that have lettering on the side, but i have seen it work on surprisingly small sizes as well. I will show some examples below.
 5. And ofcourse, you don't <ins>have</ins> to wait for objects to have letters or numbers, as mentioned you can label your own stuff and automate on this.
 6. OCR works on the entire field of view, rather then one device that you have to place somewhere and have limited range, like a infrared or ultrasonic device that does exhibit those constraints.
@@ -32,7 +32,9 @@ The second screenshot you see Amazon Prime stationary, as well as a DPD delivery
 ![Screenshot 2024-03-20 at 06 41 21](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/22c211a7-0a9c-4d12-959d-d1b8305a2f86)
 
 <sub>1</sub> 1920x1280, 1080P upscaled is considered low resolution nowadays. However, i personally won't be upgrading any time soon as it adds a considerable amount of CPU cycles to video processing as well as memory on the GPU card that you will ne needing, so for me it is the sweet spot right now.
+
 <sub>2</sub> 4K and above.
+<sub>3</sub> It is highly recommended to use a GPU with EasyOCR. Bonus is that you can also use it with Frigate, if you are not already. I am currently using a [ASUS NVIDIA GeForce GT 730 Graphics Card (PCIe 2.0, 2GB GDDR5 Memory, 4x HDMI Ports, Single-slot Design, Passive Cooling](https://www.amazon.co.uk/gp/product/B09DVN7QWH/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) and i share this between Frigate and Compreface. I currently have Compreface shut down as i cannot run both EasyOCR and Frigate within 4Gb, so i need a new machine at some point.
 
 ### Setup
 
