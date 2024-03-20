@@ -14,16 +14,25 @@ Above example shows a sublabel in Frigate with filled in recognised text. It als
 
 ### Why
 1. You don't need internet access or get an account with Platerecognizer and limited API calls.
-2. Get text recognition on anything, rather then just license plates. One could argue that without a sufficiently powerful ANPR camera both will most likely achieve the same thing. You can setup automations on cars or vans coming by, do license plate recognition in your driveway, or put numbers on your wheelie bins to recognize if they have been put outside. You can setup a TTS automation that tells you that your DPD van has arrived, or Amazon is here, or when the garbage truck is there to pick up the bins outside. Or setup an emergency SOS if you hold up 911 or HELP in front of the camera on a piece of paper, like a silent alarm. The sky is the limit.
-3. It works really well for me, and i only have 1080P cameras and it can reliably detect text at 1-30 meters, depending on the size of the text. I will most likely be even better at long range or smaller text if you have even higher resolution camera's (but remember your canvas size will grab a larger chunk of memory from your GPU).
+2. Get text recognition on anything, rather then just license plates. One could argue that without a sufficiently powerful ANPR camera both will most likely achieve the same thing. You can setup automations like:
+   - Specific vehicles driving by or that are stationary in your road and reading the text
+   - Perform license plate recognition in your driveway or further down the road
+   - Put numbers on your wheelie bins and recognize if they have been put by the road
+   - Talk to your home automation from outside by showing text on a piece paper
+   - On top of face recognition, add word recognition before the front door unlocks
+   - Add a silent alarm and call for help when someone holds up a trigger word
+3. I only have low resolution<sub>1</a> cameras and it can reliably detect text at 1-30 meters, depending on the size of the text. I will most likely be even better at long range or smaller text if you have even higher resolution camera's<sub>2</sub> (but remember your canvas size will grab a larger chunk of memory from your GPU).
 4. Object detection is great, but not fool proof. Using it with OCR makes it even better and more foolproof for your automations. And if i had to choose OCR over object or even color detection, i would actually choose OCR first. Object detection fails often, unless you really dial in your parameters or upload your own models, for which you need a lot of pictures. As objects can look alike, whereas digits or letters are always unique. Ofcourse OCR needs a certain text size, which is why it is ideal for vans or trucks that have lettering on the side, but i have seen it work on surprisingly small sizes as well. I will show some examples below.
 5. And ofcourse, you don't <ins>have</ins> to wait for objects to have letters or numbers, as mentioned you can label your own stuff and automate on this.
-6. OCR works on the entire field of view, rather then one device that you have to place somewhere and have limited range, like a infrared or ultrasonic device that does have those constraints.
+6. OCR works on the entire field of view, rather then one device that you have to place somewhere and have limited range, like a infrared or ultrasonic device that does exhibit those constraints.
 
 On the first screenshot below you can see Amazon Prime and Thames Water vans, both recognized, and this is while they are driving, at an angle.
 ![Screenshot 2024-03-20 at 06 40 42](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/c3bda13a-4d0e-4ad9-886b-830aa722a585)
 The second screenshot you see Amazon Prime stationary, as well as a DPD delivery van and truck again driving, at an angle (notice how EasyOCR picks up 2x DPD, one on the side and one on the back) and this is at least 20 meters away.
 ![Screenshot 2024-03-20 at 06 41 21](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/22c211a7-0a9c-4d12-959d-d1b8305a2f86)
+
+<sub>1</sub> 1920x1280, 1080P upscaled is considered low resolution nowadays. However, i personally won't be upgrading any time soon as it adds a considerable amount of CPU cycles to video processing as well as memory on the GPU card that you will ne needing, so for me it is the sweet spot right now.
+<sub>2</sub> 4K and above.
 
 ### Setup
 
