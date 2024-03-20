@@ -27,6 +27,7 @@ Above example shows a sublabel in Frigate with filled in recognised text. It als
 6. OCR works on the entire field of view, rather then one device that you have to place somewhere and have limited range, like a infrared or ultrasonic device that does exhibit those constraints.
 
 On the first screenshot below you can see Amazon Prime and Thames Water vans, both recognized, and this is while they are driving, at an angle.
+
 ![Screenshot 2024-03-20 at 06 40 42](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/c3bda13a-4d0e-4ad9-886b-830aa722a585)
 
 The second screenshot you see Amazon Prime stationary, as well as a DPD delivery van and truck again driving, at an angle (notice how EasyOCR picks up 2x DPD, one on the side and one on the back) and this is at least 20 meters away.
@@ -36,7 +37,7 @@ The second screenshot you see Amazon Prime stationary, as well as a DPD delivery
 
 <sub>2</sub> 4K and above.
 
-<sub>3</sub> It is highly recommended to use a GPU with EasyOCR. Bonus is that you can also use it with Frigate, if you are not already. I am currently using a [ASUS NVIDIA GeForce GT 730 Graphics Card (PCIe 2.0, 2GB GDDR5 Memory, 4x HDMI Ports, Single-slot Design, Passive Cooling](https://www.amazon.co.uk/gp/product/B09DVN7QWH/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) and i share this between Frigate and Compreface in a SFF server. I currently have Compreface shut down as i cannot run all 3 comfortably within 4Gb.
+<sub>3</sub> It is highly recommended to use a GPU with EasyOCR. Bonus is that you can also use it with Frigate, if you are not already. I am currently using a [MSI GeForce GTX 1050Ti 4GT LP Gaming Graphics Card - 4GB GDDR5, 1392MHz, PCI Express x16 3.0, 128-bit, DL-DVI-D, DP v 1.4, HDMI 2.0b](https://www.amazon.co.uk/gp/product/B01N683IAQ/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1) and i share this between Frigate and Compreface in a SFF server. I currently have Compreface shut down as i cannot run all 3 comfortably within 4Gb.
 
 ### Setup
 
