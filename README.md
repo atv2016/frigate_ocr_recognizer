@@ -4,27 +4,25 @@ Identify OCR text using EasyOCR and Pytorch and add them as sublabels to [blakeb
 
 This is an experimental fork of [ljmerza/frigate_plate_recognizer](https://github.com/ljmerza/frigate_plate_recognizer/tree/master) and is very much in a beta state. Things will probably not work as they should.
 
-Note the image size is currently very large +- 10Gb, because OpenCV, PyTorch and Nvidia CUDA being included. I will look at minimizing this at some point but no promises. You will need a installation of Frigate, a MQTT broker like Mosquito and optionally you can have Home Assistant installed if you want to automate on it (or something else).
+Note the image size is currently very large +- 8Gb, 6Gb compressed, because OpenCV, PyTorch and Nvidia CUDA are being included. I will look at minimizing this at some point but no promises and it might not be possible. You will need a installation of Frigate, a MQTT broker like Mosquito and optionally you can have Home Assistant installed if you want to automate on it (or something else).
 
 ### Example
 
 ![Screenshot 2024-03-17 at 18 45 51](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/cbf7abb5-9e21-4d00-91f5-ae709c5b7c5d)
 
-Above example shows a sublabel in Frigate with filled in recognised text. It also shows the importance of not having timestamps or other things on the screen, as they will also be recognised.
+Above example shows a sublabel in Frigate with filled in recognised text. It also shows the camera name and a timestamp, which is why we usually tell you to disable that on the stream, as it will also be recognized and muddle up your sublabels in Frigate.
 
 ### Why
-1. You don't need internet access or get an account with Platerecognizer and limited API calls
-2. Get text recognition on anything, rather then just license plates. One could argue that without a sufficiently powerful ANPR camera both will most likely achieve the same thing. You can setup automations on cars or vans coming by, license plate recognition in your driveway, or put numbers on your wheelie bins to recognize if they have been put outside. You can setup a TTS automation that tells you that your DPD van has arrived, or Amazon is here, or when the garbage truck is there to pick up the bins outside. Or setup an emergency SOS if you hold up 911 or HELP in front of the camera on a piece of paper, like a silent alarm.
-3. It works really well for me, and i only have 1080P cameras and it can reliably detect text at 1-30 meters, depending on the size of the ext. I will most likely be even better at long range if you have 4K.
-4. Object detection is great, but not fool proof. Using it with OCR makes it even better and more foolproof for your automations. And if i had to choose OCR over object or even color detection, i would choose OCR first. Object detection fails often, unless you really dial in your parameters or upload your own models, for which you need a lot of pictures. As objects can look alike, whereas digits or letters are always unique. Ofcourse OCR needs a certain text size, which is why it is ideal for vans or trucks that have lettering on the side, but i have seen it work on surprisingly small sizes as well. I will show some examples below.
-5. OCR works on the entire field of view, rather then one device that you have to place somewhere, like a PIR detector or some other device (Radar/ToF/Ultrasonic etc.)
+1. You don't need internet access or get an account with Platerecognizer and limited API calls.
+2. Get text recognition on anything, rather then just license plates. One could argue that without a sufficiently powerful ANPR camera both will most likely achieve the same thing. You can setup automations on cars or vans coming by, do license plate recognition in your driveway, or put numbers on your wheelie bins to recognize if they have been put outside. You can setup a TTS automation that tells you that your DPD van has arrived, or Amazon is here, or when the garbage truck is there to pick up the bins outside. Or setup an emergency SOS if you hold up 911 or HELP in front of the camera on a piece of paper, like a silent alarm. The sky is the limit.
+3. It works really well for me, and i only have 1080P cameras and it can reliably detect text at 1-30 meters, depending on the size of the text. I will most likely be even better at long range or smaller text if you have even higher resolution camera's (but remember your canvas size will grab a larger chunk of memory from your GPU).
+4. Object detection is great, but not fool proof. Using it with OCR makes it even better and more foolproof for your automations. And if i had to choose OCR over object or even color detection, i would actually choose OCR first. Object detection fails often, unless you really dial in your parameters or upload your own models, for which you need a lot of pictures. As objects can look alike, whereas digits or letters are always unique. Ofcourse OCR needs a certain text size, which is why it is ideal for vans or trucks that have lettering on the side, but i have seen it work on surprisingly small sizes as well. I will show some examples below.
+5. OCR works on the entire field of view, rather then one device that you have to place somewhere and have limited range, like a infrared or ultrasonic device that does has those constraints.
 
 On the first screenshot below you can see Amazon Prime and Thames Water vans, both recognized, and this is while they are driving, at an angle.
 ![Screenshot 2024-03-20 at 06 40 42](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/c3bda13a-4d0e-4ad9-886b-830aa722a585)
 The second screenshot you see Amazon Prime stationary, as well as a DPD delivery van and truck again driving, at an angle (notice how EasyOCR picks up 2x DPD, one on the side and one on the back) and this is at least 20 meters away.
 ![Screenshot 2024-03-20 at 06 41 21](https://github.com/atv2016/frigate_ocr_recognizer/assets/16917203/22c211a7-0a9c-4d12-959d-d1b8305a2f86)
-
-I have been more then impressed with this and i think it is very worthwile addition to have, if you need to automate on things like this.
 
 ### Setup
 
