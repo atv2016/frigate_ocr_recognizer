@@ -96,9 +96,18 @@ def ocr_recognizer(image):
 
     reader = easyocr.Reader(['en'],gpu=True)
 
+    if "CANVAS_SIZE" in os.environ:
+        CANVAS_SIZE=int(os.environ["CANVAS_SIZE"])
+    else:
+        CANVAS_SIZE=""
 
-    result = reader.readtext(image, canvas_size=1000,detail=0)
-
+    if CANVAS_SIZE:
+    	print(f"Using custom canvas size of { CANVAS_SIZE }")
+    	result = reader.readtext(image,canvas_size=CANVAS_SIZE,detail=0)
+    else:
+    	print("Using default canvas size of 2560")
+    	result = reader.readtext(image,detail=0)
+    
     # Clean up reader object
     del(reader)
     
