@@ -103,7 +103,14 @@ Also keep in mind that it will detect the object, and then keep updating the sna
 
 It is also recommended to disable any logos on the cameras you are using as they will be part of the recognition. When text has been extracted, it will be added to the sublabel in frigate, and prefaced with OCR (on the sublabel filter it will take the last 30 characters or so).
 
-Finally, currently the canvas_size given to EasyOCR is 1000. If you have the available GPU memory, you can leave that out for better image. I have to share the GPU with frigate and compreface, so i only have a little left i can use. But the larger the image, and the higher the resolution, the better. My camera's have a 1080P stream, but it would be interesting to see what results a 4K camera would give. 
+Finally, because of memory constraints i set my canvas_size (EasyOCR value) to 1000 (I need to share my GPU with Frigate and Compreface for now, so i only have little left i can dedicate to EasyOCR). This seems to work fine overall for me, but it <ins>is</ins> a compromise. For example, when detecting certain fonts, you want to use the maximum canvas_size (default 2560), if you have the available GPU memory. You can set the canvas_size by using the CANVAS_SIZE environment variable in docker, like so: 
+
+So if you feel you are missing out on things that it should recognize, increase your canvas size if you can. If you don't set it it will use the default value.
+```
+   environment:
+      - CANVAS_SIZE=1000
+```
+In general the rule of thumb is the larger the image, and the higher the resolution, the better. My camera's have a 1080P stream, but it would be interesting to see what results a 4K camera would give, although as mentioned that has again completely different challenges.
 
 When you do change it and you have customised EasyOCR recognition (i would not recommend it, but see bottom of this article) make sure to test if it works on a variety of your images as changing any setting to EasyOCR or given image, can have detrimental effects on text recognition. Sometimes making the canvas larger (or smaller) might have a worse effect, especially if you combine it with other EasyOCR parameters, and when you do finetune it more with said parameters, even a minor thing as removing the timestamps or logo's can affect recognition. 
 
