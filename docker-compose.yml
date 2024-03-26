@@ -16,3 +16,4 @@ services:
     environment:
       - TZ=Europe/London
       - NVIDIA_DRIVER_CAPABILITIES=all
+      - CANVAS_SIZE=1000
